@@ -6,6 +6,7 @@ sys.path.append( wiringpi_path )
 import wiringpi2 as wiringpi
 
 class InterfaceSPI():
+    # constants used in constructor
     CE_0 = 0
     CE_1 = 1
     SPEED_0_5MHZ = 500000
@@ -25,6 +26,9 @@ class InterfaceSPI():
             raise SetupException('Error while SPI setup')
         print('InterfaceSPI initalized (CE_%d, speed:%.1fMHz)' % (ce_channel, speed * 0.000001))
 
+    # read_write - True = read; False = write
+    # address_char - address to read / write
+    # string_data - string which char values will be overwritten on read or written on write
     def send(self, read_write, address_char, string_data):
         if (read_write):
             address_bin = fill_bits_to_byte(str2bits(address_char))
@@ -32,6 +36,7 @@ class InterfaceSPI():
         string_data_cpy = address_char + string_data[:]
         error = wiringpi.wiringPiSPIDataRW(self.ce_channel, string_data_cpy)
         if (error == -1):
+            # couldn't make SendingEcteption take more than one argument in contructor...
             #error_msg = SendingException.get_msg(read_write, address_char, string_data)
             error_msg = (
                 'Error while SPI %s address:%s data:%s' % (

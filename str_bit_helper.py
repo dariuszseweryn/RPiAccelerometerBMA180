@@ -23,6 +23,7 @@ def parse_int_string_to_bin_string(string):
         bits = string
     return bits
 
+# when you have lsbs and you want to have string with 8 bit chars
 def fill_bits_to_byte(bits):
     length = len(bits)
     byte_bits = ''
@@ -30,9 +31,11 @@ def fill_bits_to_byte(bits):
         byte_bits += '0'
     return byte_bits + bits   
 
+# converts acc reading to angle
 def to_angle(x):
     return math.degrees(math.asin(float(x/8192)))
 
+# visual reasons
 def float_to_string(float_value, min_string_length):
     string_value = ('%.2f' % float_value)
     characters_to_add = min_string_length - len(string_value)

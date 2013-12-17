@@ -7,9 +7,11 @@ from str_bit_helper import *
 
 GP_DATA_READY_INT_PIN = 22
 
+# using Bosch's BMA180 - 3-axial MEMS accelerometer
 class Accelerometer():
     ACCUMULATOR_COUNT = 30
 
+    # technically almost ready to use I2C if provided
     def __init__(self, interface):
         self.read_acc_values_address = bits2str(fill_bits_to_byte(bin(0x02)[2:]))
         self.interface = interface
