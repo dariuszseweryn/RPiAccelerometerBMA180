@@ -9,18 +9,12 @@ GP_DATA_READY_INT_PIN = 22
 
 # using Bosch's BMA180 - 3-axial MEMS accelerometer
 class Accelerometer():
-    ACCUMULATOR_COUNT = 30
 
     # technically almost ready to use I2C if provided
     def __init__(self, interface):
         self.read_acc_values_address = bits2str(fill_bits_to_byte(bin(0x02)[2:]))
         self.interface = interface
         self.callbacks = set()
-        self.acc_x = 0
-        self.acc_y = 0
-        self.acc_z = 0
-        self.acc_count = 0
-        self.notify = True
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup(GP_DATA_READY_INT_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         GPIO.add_event_detect(
@@ -47,21 +41,8 @@ class Accelerometer():
 
     def accelerometer_int(self, channel):
         x,y,z = self.read_accelerometer_values()
-        self.acc_x += x
-        self.acc_y += y
-        self.acc_z += z
-        self.acc_count += 1
-        if self.acc_count > Accelerometer.ACCUMULATOR_COUNT:
-            x = self.acc_x / self.acc_count
-            y = self.acc_y / self.acc_count
-            z = self.acc_z / self.acc_count
-            self.acc_x = 0
-            self.acc_y = 0
-            self.acc_z = 0
-            self.acc_count = 0
-            if self.notify:
-                for callback in self.callbacks:
-                    callback(x,y,z)
+        for callback in self.callbacks:
+            callback(x,y,z)
         
     def read_accelerometer_values(self):
         read_data = self.__read_acc()
@@ -75,9 +56,6 @@ class Accelerometer():
 
     def remove_callback(self, callback):
         self.callbacks.remove(callback)
-
-    def set_notify(self, notify):
-        self.notify = notify
         
     def __get_value(self, high_byte_char, low_byte_char):
         value = str2bits(high_byte_char) + str2bits(low_byte_char)[:-2]
